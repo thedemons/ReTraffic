@@ -170,11 +170,12 @@ Func ItemChange($this)
 
 	Local $Data = _GUICtrlListView_GetItemText($list, $iRow, $iCol)
 
-	Local $GUI_Change = GUICreate("Change value", 300, 35)
-	Local $Input = GUICtrlCreateInput($Data, 5, 5, 290, 25)
+	Local $GUI_Change = GUICreate("Change value", 500, 35)
+	Local $Input = GUICtrlCreateInput($Data, 5, 5, 490, 25)
 
 	GUISetState()
 
+	ControlClick($GUI_Change, "", "", "left", 1, 0, 0)
 	While 1
 
 		If _IsPressed("0D") Then
