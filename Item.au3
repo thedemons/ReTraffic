@@ -170,8 +170,16 @@ Func ItemChange($this)
 
 	Local $Data = _GUICtrlListView_GetItemText($list, $iRow, $iCol)
 
-	Local $GUI_Change = GUICreate("Change value", 500, 35)
-	Local $Input = GUICtrlCreateInput($Data, 5, 5, 490, 25)
+	Local $w = 500
+	Local $h = 35
+
+	If StringLen($Data) > 200 Then
+		$w = 800
+		$h = 300
+	EndIf
+
+	Local $GUI_Change = GUICreate("Change value", $w, $h)
+	Local $Input = GUICtrlCreateEdit($Data, 5, 5, $w - 10, $h - 10, 0x0004)
 
 	GUISetState()
 
