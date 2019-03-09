@@ -115,6 +115,8 @@ Func ItemGo($this)
 	Local $Index = $item.sel
 
 	Local $itms = $Item.itms
+	If $Index < 0 Or $Index >= UBound($itms) Then Return False
+
 	Local $Item = $itms[$Index]
 	Local $Request = $item.request
 	Local $Post = $item.post
@@ -211,9 +213,10 @@ Func ItemCopy($this)
 	Local $Index = $item.sel
 
 	Local $itms = $Item.itms
+	If $Index < 0 Or $Index >= UBound($itms) Then Return False
+
 	Local $Item = $itms[$Index]
 
-	Local $RequestCount = _GUICtrlListView_GetItemCount($listRequest)
 	Local $PostCount = _GUICtrlListView_GetItemCount($listPost)
 
 	Local $cookie = __GetCookieFromHeader($item.raw)
@@ -225,47 +228,58 @@ Func ItemCopy($this)
 
 	$Data &= 'Local $Cookie = "' & $cookie & '"' & @CRLF
 
-	$Data &= "Local $Request, $DataRequest, $DataPost" & @CRLF
+	$Data &= "Local $Request, $DataRequest, $DataPost" & @CRLF & @CRLF
 
-	For $i = 0 To $RequestCount - 1
+	$Data &= __GetKey($listRequest) & @CRLF
+	$Data &= __GetValue($listRequest, "$DataRequest") & @CRLF
 
-		If _GUICtrlListView_GetItemChecked($listRequest, $i) = False Then ContinueLoop
-
-		$key = _GUICtrlListView_GetItemText($listRequest, $i)
-		$value = _GUICtrlListView_GetItemText($listRequest, $i, 1)
-
-		$Data &= '$DataRequest &= "' & __URIEncode($key) & "=" & __URIEncode($value)
-
-		If $i < $RequestCount - 1 Then $Data &= "&"
-
-		$Data &= '"' & @CRLF
-
-	Next
-
-	$Data &= @CRLF
-
-	For $i = 0 To $PostCount - 1
-
-		If _GUICtrlListView_GetItemChecked($listPost, $i) = False Then ContinueLoop
-
-		$key = _GUICtrlListView_GetItemText($listPost, $i)
-		$value = _GUICtrlListView_GetItemText($listPost, $i, 1)
-
-		$Data &= '$DataPost &= "' & __URIEncode($key) & "=" & __URIEncode($value)
-
-		If $i < $PostCount - 1 Then $Data &= "&"
-
-		$Data &= '"' & @CRLF
-
-	Next
-
-	$Data &= @CRLF
+	$Data &= __GetKey($listPost) & @CRLF
+	$Data &= __GetValue($listPost, "$DataPost") & @CRLF
 
 	$Data &= "$Request = _HttpRequest(2, $URL & $DataRequest, $DataPost, $Cookie)"
 
 	ClipPut($Data)
 
 EndFunc
+
+Func __GetKey($list)
+
+	Local $listCount = _GUICtrlListView_GetItemCount($list)
+
+	Local $Data
+
+	For $i = 0 To $listCount - 1
+
+		$key = _GUICtrlListView_GetItemText($list, $i)
+		$value = _GUICtrlListView_GetItemText($list, $i, 1)
+		$Data &= "Local $" & __normalize($key) & ' = "' & __URIEncode($value) & '"' & @CRLF
+	Next
+
+	Return $Data
+EndFunc
+
+Func __GetValue($list, $var)
+
+	Local $listCount = _GUICtrlListView_GetItemCount($list)
+	Local $Data
+
+	For $i = 0 To $listCount - 1
+
+		If _GUICtrlListView_GetItemChecked($list, $i) = False Then ContinueLoop
+
+		$key = _GUICtrlListView_GetItemText($list, $i)
+		$value = _GUICtrlListView_GetItemText($list, $i, 1)
+
+		$Data &= $var & ' &= "'
+		If $i > 0 Then $Data &= "&"
+
+		$Data &= __URIEncode($key) & '=" & $' & __normalize($key) & @CRLF
+	Next
+
+	Return $Data
+
+EndFunc
+
 
 Func __GetPostData($Data)
 
@@ -318,4 +332,10 @@ Func __Key2Array($Data)
 	If UBound($Ret) = 0 Then Return False
 
 	Return $Ret
+EndFunc
+
+Func __normalize($str)
+
+	Return StringReplace($str, " ", "")
+
 EndFunc

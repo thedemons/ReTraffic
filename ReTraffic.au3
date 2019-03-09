@@ -96,6 +96,8 @@ While 1
 
 	EndSwitch
 
+	Sleep(20)
+
 WEnd
 
 Func _WM_NOTIFY_Handler($hWnd, $iMsg, $wParam, $lParam)
