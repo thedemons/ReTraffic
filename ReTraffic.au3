@@ -81,6 +81,10 @@ While 1
 		Case $btnEditRaw
 			GUICtrlSetState($editRaw, GUICtrlGetState($editRaw) = 144 ? 64 : 128)
 
+		Case $btnDelAll
+			$Item.delete
+			$List.delete
+
 		Case $btnGo
 			$Item.go()
 

@@ -15,8 +15,23 @@ Func Item()
 	$Item.__defineGetter("go", ItemGo)
 	$Item.__defineGetter("change", ItemChange)
 	$Item.__defineGetter("copy", ItemCopy)
+	$Item.__defineGetter("delete", ItemDelete)
 
 	Return $Item
+EndFunc
+
+Func ItemDelete($this)
+
+	Local $Item = $this.parent
+
+	Local $itms[0]
+	$Item.itms = $itms
+
+	_GUICtrlListView_DeleteAllItems($listPost)
+	_GUICtrlListView_DeleteAllItems($listRequest)
+	_StLoadHtml($WebView, "")
+	GUICtrlSetData($editRaw, $item.raw)
+
 EndFunc
 
 Func ItemAdd($this)
@@ -64,6 +79,8 @@ Func ItemLoad($this)
 	Local $Request = $item.request
 	Local $Post = $item.post
 
+
+	_StLoadHtml($WebView, "")
 	GUICtrlSetData($editRaw, $item.raw)
 
 	_GUICtrlListView_DeleteAllItems($listPost)

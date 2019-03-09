@@ -26,8 +26,18 @@ Func ListURL($GUI, $Text, $x, $y, $w, $h)
 
 	$hList.__defineGetter("add", ListURLAdd)
 	$hList.__defineGetter("check", ListURLCheck)
+	$hList.__defineGetter("delete", ListURLDelete)
 
 	Return $hList
+
+EndFunc
+
+Func ListURLDelete($this)
+
+	Local $hList = $this.parent
+	Local $list = $__AllList[$hList.index]
+
+	_GUICtrlListView_DeleteAllItems($list)
 
 EndFunc
 
