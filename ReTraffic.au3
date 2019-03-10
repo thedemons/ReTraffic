@@ -64,8 +64,20 @@ $tabText = GUICtrlCreateTabItem("Text view")
 
 GUISetState()
 
+; JSON gui
+$GUI_JSON = GUICreate("JSON Data", 643, 100)
+$listJSON = GUICtrlCreateListView("Key|Value", 0, 0, 643, 875, $WS_BORDER, $LVS_EX_FULLROWSELECT + $LVS_EX_CHECKBOXES + $LVS_EX_GRIDLINES)
+_GUICtrlListView_SetColumnWidth($listJSON, 0, 315)
+_GUICtrlListView_SetColumnWidth($listJSON, 1, 315)
+$btnDone = GUICtrlCreateButton("Done", 550,0,100, 30)
+GUICtrlSetFont(-1, 11)
+;~ GUISetState()
+
+; ===
+$hLV_JSON = GUICtrlGetHandle($listJSON)
 $hLV_Request = GUICtrlGetHandle($listRequest)
 $hLV_Post = GUICtrlGetHandle($listPost)
+
 GUIRegisterMsg($WM_NOTIFY, "_WM_NOTIFY_Handler")
 
 ;=============
@@ -156,9 +168,11 @@ Func _WM_NOTIFY_Handler($hWnd, $iMsg, $wParam, $lParam)
     EndSwitch
 
     If BitAND(DllStructGetData($tStruct, 3), 0xFFFFFFFF) = $NM_DBLCLK Then
-        $iRow = DllStructGetData($tStruct, 4)
-        $iCol = DllStructGetData($tStruct, 5)
+
+		$iRow = DllStructGetData($tStruct, 4)
+		$iCol = DllStructGetData($tStruct, 5)
 		If $iRow >= 0 Then $Item.change($iLV, $iRow, $iCol)
 	EndIf
 
 EndFunc
+

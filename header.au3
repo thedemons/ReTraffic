@@ -13,27 +13,28 @@
 #include "_HttpRequest.au3"
 #include "ListURL.au3"
 #include "Item.au3"
+#include "JSON.au3"
 #include "Sciter-UDF.au3"
 
 
 ; GUI
 Global $GUI
-Global $List, $btnAddNew, $Item, $prevSel = 0
-Global $editRaw, $editText, $listRequest, $listPost
+Global $List, $btnAddNew, $Item, $prevSel = 0, $btnDone
+Global $editRaw, $editText, $listRequest, $listPost, $listJSON, $GUI_JSON
 
 ; info
 Global $isSubGui = False
-Global $__version = 0.2
+Global $__version = 0.3
 
 ; gui
 Global $GuiW = 1200, $GuiH = 800
 Global $WebView
 
-Global $aUserAgent[3]
+Global $aUserAgent[0]
 
-__CreateUserAgent(0, "Chrome", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36")
-__CreateUserAgent(1, "Firefox", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:63.0) Gecko/20100101 Firefox/63.0")
-__CreateUserAgent(2, "Safari iOS 12", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1")
+__CreateUserAgent("Chrome", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36")
+__CreateUserAgent("Firefox", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:63.0) Gecko/20100101 Firefox/63.0")
+__CreateUserAgent("Safari iOS 12", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1")
 
 
 Func __GetCookieFromHeader($Header)
@@ -66,7 +67,10 @@ Func __GetUAFromHeader($Header)
 
 EndFunc
 
-Func __CreateUserAgent($index, $name, $str)
+Func __CreateUserAgent($name, $str)
+
+	$index = UBound($aUserAgent)
+	ReDim $aUserAgent[ $index + 1]
 
 	$aUserAgent[$index] = IDispatch()
 	$aUserAgent[$index].name = $name
