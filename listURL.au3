@@ -66,7 +66,7 @@ Func ListURLAdd($this)
 
 	$hList.sel = $index
 
-	$Item.load($index)
+	$Item.load
 	$Item.sel = $index
 
 EndFunc
@@ -84,8 +84,8 @@ Func ListURLCheck($this)
 
 	$hlist.sel = $sel[1]
 
-	$Item.load($sel[1])
 	$Item.sel = $sel[1]
+	$Item.load()
 
 	Return $sel[1]
 

@@ -22,10 +22,12 @@ GUISetState()
 
 ; Tab Request
 $GUI_Request = GUICreate("", 843, 500, 355, 0, $WS_POPUP, $WS_EX_MDICHILD, $GUI)
-GUICtrlCreateTab(0, 0, 843, 500)
+$tab_Request = GUICtrlCreateTab(0, 0, 843, 500)
 
 $btnCopy = GUICtrlCreateButton("Copy Code", 750, 0, 94, 22)
 GUICtrlSetFont(-1, 11, 800)
+
+$comboUA = GUICtrlCreateCombo("User-Agent default", 140, 0, 115, 22, 3)
 
 $tabRaw = GUICtrlCreateTabItem("Raw")
 	$btnEditRaw = GUICtrlCreateButton("Edit", 650, 0, 100, 22)
@@ -48,13 +50,14 @@ GUISetState()
 
 ; Tab Respone
 $GUI_Respone = GUICreate("", 843, 293, 355, 500, $WS_POPUP, $WS_EX_MDICHILD, $GUI)
-GUICtrlCreateTab(0, 0, 843, 300)
+$tab_Respone = GUICtrlCreateTab(0, 0, 843, 300)
 
 $tabWeb = GUICtrlCreateTabItem("Web view")
 	$WebView = _StincGui($GUI_Respone, 2, 22, 837, 300)
 
 $tabText = GUICtrlCreateTabItem("Text view")
 	$editText = GUICtrlCreateEdit("", 0, 22, 837, 271)
+	GUICtrlSetState(-1, 2048)
 	GUICtrlSetFont(-1, 11, Default, Default, "CONSOLAS")
 
 GUISetState()
@@ -65,12 +68,26 @@ GUIRegisterMsg($WM_NOTIFY, "_WM_NOTIFY_Handler")
 
 ;=============
 
+_LoadUserAgent()
+
 While 1
 
 	$List.check()
 
 	$aMsg = GUIGetMsg(1)
 	Switch $aMsg[0]
+
+		Case $tab_Request
+			$sel = GUICtrlRead($tab_Request)
+
+			If $prevSel = 0 And $sel = 1 And GUICtrlGetState($editRaw) <> 144 Then $Item.load(True)
+			If $prevSel = 0 And $sel = 2 And GUICtrlGetState($editRaw) <> 144 Then $Item.load(True)
+
+			$prevSel = $sel
+
+		Case $tab_Respone
+			$sel = GUICtrlRead($tab_Respone)
+			If $sel = 1 Then GUICtrlSetState($tabText, 2048)
 
 		Case $btnAddNew
 			AddNewItem()
@@ -100,6 +117,21 @@ While 1
 
 WEnd
 
+Func _LoadUserAgent()
+
+	Local $Str
+
+	For $i = 0 To UBound($aUserAgent) - 1
+
+		$Str &= $aUserAgent[$i].name
+
+		If $i < UBound($aUserAgent) - 1 Then $Str &= "|"
+
+	Next
+
+	GUICtrlSetData($comboUA, $Str)
+EndFunc
+
 Func _WM_NOTIFY_Handler($hWnd, $iMsg, $wParam, $lParam)
 
     #forceref $hWnd, $iMsg, $wParam
@@ -121,6 +153,6 @@ Func _WM_NOTIFY_Handler($hWnd, $iMsg, $wParam, $lParam)
         $iRow = DllStructGetData($tStruct, 4)
         $iCol = DllStructGetData($tStruct, 5)
 		If $iRow >= 0 Then $Item.change($iLV, $iRow, $iCol)
-    EndIf
+	EndIf
 
 EndFunc
