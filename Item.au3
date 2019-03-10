@@ -581,10 +581,8 @@ Func __GetKey($Item, $iLV, $list)
 
 		$key = _GUICtrlListView_GetItemText($list, $i)
 		$value = _GUICtrlListView_GetItemText($list, $i, 1)
-		MsgBox(0,"",$key)
 
 		If __isJSON($value) Then
-			MsgBox(0,"",$value)
 
 			Local $itemList = $iLv = 1 ? $subItem.request[$i] : $subItem.post[$i]
 			Local $Json = $itemList.json
@@ -595,22 +593,17 @@ Func __GetKey($Item, $iLV, $list)
 
 				If $Json[$n].check = False Then ContinueLoop
 
-				$Data &=  "$" & __normalize($key) & " &= '" & $Json[$n].key & ":" & $Json[$n].value
+				$Data &=  "$" & __normalize($key) & " &= '" & $Json[$n].key & ":" & $Json[$n].value & ",'" & @CRLF
 
-				If $n < UBound($Json) - 1 Then
-					$Data &= ",'" & @CRLF
-				Else
-					$Data &= "}'" & @CRLF
-				EndIf
 			Next
 
+			$Data = StringTrimRight($Data, 4) & "}'" & @CRLF
 			$Data &= "$" & __normalize($key) & " = _URIEncode($" & __normalize($key) & ")" & @CRLF & @CRLF
 
 		Else
 
 			$Data &= "Local $" & __normalize($key) & ' = "' & __URIEncode($value) & '"' & @CRLF
 
-			MsgBox(0,"",$Data)
 		EndIf
 	Next
 
@@ -717,24 +710,4 @@ Func __normalize($str)
 
 EndFunc
 
-Func _WM_NOTIFY_JSON($hWnd, $iMsg, $wParam, $lParam)
 
-    #forceref $hWnd, $iMsg, $wParam
-
-    ; Struct = $tagNMHDR and "int Item;int SubItem" from $tagNMLISTVIEW
-    Local $tStruct = DllStructCreate("hwnd;uint_ptr;int_ptr;int;int", $lParam)
-    If @error Then Return
-
-    Switch DllStructGetData($tStruct, 1)
-        Case $hLV_JSON
-            $iLV = 1
-        Case Else
-            Return
-    EndSwitch
-
-    If BitAND(DllStructGetData($tStruct, 3), 0xFFFFFFFF) = $NM_DBLCLK Then
-
-		MsgBox(0,"","")
-	EndIf
-
-EndFunc
