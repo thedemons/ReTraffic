@@ -82,6 +82,7 @@ GUIRegisterMsg($WM_NOTIFY, "_WM_NOTIFY_Handler")
 
 ;=============
 
+_CheckForUpdate()
 _LoadUserAgent()
 
 While 1
@@ -148,6 +149,28 @@ Func _LoadUserAgent()
 	Next
 
 	GUICtrlSetData($comboUA, $Str)
+EndFunc
+
+Func _CheckForUpdate()
+
+	Local $Site = "https://github.com/thedemons/ReTraffic/blob/master/header.au3"
+
+	Local $Request = _HttpRequest(2, $Site)
+
+	Local $ver = StringRegExp($Request, '\>ver\=(.*?)\<', 1)
+	If IsArray($ver) = False Then Return
+
+	If $ver[0] <> $__version Then
+
+		Local $msg = MsgBox(1, "Thông báo", "Đã có phiên bản mới, bạn có muốn download?")
+
+		If $msg <> 1 Then Return
+
+		ShellExecute("https://github.com/thedemons/ReTraffic")
+
+	EndIf
+
+
 EndFunc
 
 Func _WM_NOTIFY_Handler($hWnd, $iMsg, $wParam, $lParam)
