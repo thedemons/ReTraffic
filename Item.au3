@@ -581,13 +581,15 @@ Func __GetKey($Item, $iLV, $list)
 
 		$key = _GUICtrlListView_GetItemText($list, $i)
 		$value = _GUICtrlListView_GetItemText($list, $i, 1)
+		MsgBox(0,"",$key)
 
 		If __isJSON($value) Then
+			MsgBox(0,"",$value)
 
 			Local $itemList = $iLv = 1 ? $subItem.request[$i] : $subItem.post[$i]
 			Local $Json = $itemList.json
 
-			$Data = "Local $" & __normalize($key) & ' = "{"' & @CRLF
+			$Data &= "Local $" & __normalize($key) & ' = "{"' & @CRLF
 
 			For $n = 0 to UBound($Json) - 1
 
@@ -607,6 +609,8 @@ Func __GetKey($Item, $iLV, $list)
 		Else
 
 			$Data &= "Local $" & __normalize($key) & ' = "' & __URIEncode($value) & '"' & @CRLF
+
+			MsgBox(0,"",$Data)
 		EndIf
 	Next
 
