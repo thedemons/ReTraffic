@@ -23,7 +23,7 @@ Global $editRaw, $editText, $listRequest, $listPost
 
 ; info
 Global $isSubGui = False
-Global $__version = 0.1
+Global $__version = 0.2
 
 ; gui
 Global $GuiW = 1200, $GuiH = 800

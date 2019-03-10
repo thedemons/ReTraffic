@@ -17,6 +17,7 @@ Func Item()
 	$Item.__defineGetter("copy", ItemCopy)
 	$Item.__defineGetter("delete", ItemDelete)
 	$Item.__defineGetter("update", ItemUpdate)
+	$Item.__defineGetter("filter", ItemFilter)
 
 	Return $Item
 EndFunc
@@ -56,8 +57,10 @@ Func ItemUpdate($this)
 
 	Local $Item = $this.parent
 	Local $Index = $this.arguments.values[0]
-
 	Local $itms = $Item.itms
+
+	If $Index < 0 Or $Index >= UBound($itms) Then Return False
+
 	Local $subItem = $itms[$Index]
 
 	Local $Data = $this.arguments.length < 2 ? $subItem.raw : $this.arguments.values[1]
@@ -137,6 +140,7 @@ Func ItemGo($this)
 
 	Local $Item = $this.parent
 	Local $Index = $item.sel
+	Local $isWebView = $this.arguments.length = 0 ? True : $this.arguments.values[0]
 
 	$Item.update($Index, GUICtrlRead($editRaw))
 	Local $itms = $Item.itms
@@ -164,16 +168,76 @@ Func ItemGo($this)
 
 	Local $Html = _HttpRequest(2, $subItem.url & $DataRequest, $DataPost, $cookie, $ref, $UserAgent)
 
-	$subItem.html = __Encode($Html)
+	If $isWebView Then
+		$subItem.html = __Encode($Html)
+		_StLoadHtml($WebView, $subItem.html)
+	Else
+		$subItem.html = $Html
+	EndIf
 
 	GUICtrlSetData($editText, $Html)
-	_StLoadHtml($WebView, $subItem.html)
+
 
 	$subItem.request = $Request
 	$subItem.post = $Post
 	$itms[$Index] = $subItem
 	$Item.itms = $itms
 
+	Return $subItem.html
+EndFunc
+
+Func ItemFilter($this)
+
+	Local $Item = $this.parent
+	Local $RequestCount = _GUICtrlListView_GetItemCount($listRequest)
+	Local $PostCount = _GUICtrlListView_GetItemCount($listPost)
+
+	For $i = 0 To $RequestCount - 1
+		_GUICtrlListView_SetItemChecked($listRequest, $i, True)
+
+	Next
+	For $i = 0 To $PostCount - 1
+		_GUICtrlListView_SetItemChecked($listPost, $i, True)
+	Next
+
+	Local $Target = $Item.go(False)
+
+	For $i = 0 To $RequestCount - 1
+
+		_GUICtrlListView_SetItemChecked($listRequest, $i, False)
+		$Html = $Item.go(False)
+
+		If __CheckResult($Html, $Target) = False Then
+			_GUICtrlListView_SetItemChecked($listRequest, $i, True)
+		EndIf
+	Next
+
+	For $i = 0 To $PostCount - 1
+
+		_GUICtrlListView_SetItemChecked($listPost, $i, False)
+		$Html = $Item.go(False)
+
+		If __CheckResult($Html, $Target) = False Then
+			_GUICtrlListView_SetItemChecked($listPost, $i, True)
+		EndIf
+	Next
+
+	$Item.go
+
+EndFunc
+
+Func __CheckResult($Html, $Target)
+
+	Local $len = StringLen($Target)
+
+	If StringLen($Html) < $len - $len  * 0.2 Or StringLen($Html) > $len + $len  * 0.2 Then Return False
+
+	If StringInStr($Html, "error") And StringInStr($Target, "error") = False Then Return False
+
+	If StringInStr($Html, "head") = False And StringInStr($Target, "head") Then Return False
+	If StringInStr($Html, "head") And StringInStr($Target, "head") = False Then Return False
+
+	Return True
 EndFunc
 
 Func ItemChange($this)
@@ -183,7 +247,6 @@ Func ItemChange($this)
 	Local $iRow = $this.arguments.values[1]
 	Local $iCol = $this.arguments.values[2]
 	Local $list = $iLv = 1 ? $listRequest : $listPost
-
 
 	Local $Data = _GUICtrlListView_GetItemText($list, $iRow, $iCol)
 
@@ -375,20 +438,19 @@ Func __Key2Array($Data)
 		; if data not contain "="
 		If StringInStr( $aData[$i], "=") = False Then
 
-			$key = $aData[$i]
+			$key = __URIDecode( $aData[$i] )
 			$value = ""
 		Else
 
 			$SplitData = StringSplit($aData[$i], "=", 1)
-			$key = $SplitData[1]
-			$value = $SplitData[2]
+			$key = __URIDecode( $SplitData[1] )
+			$value = __URIDecode( $SplitData[2] )
 		EndIf
 
 		$Ret[$i - 1] = IDispatch()
-		$Ret[$i - 1].key = __URIDecode( $key ) ; key
-		$Ret[$i - 1].value = __URIDecode( $value ) ; value
+		$Ret[$i - 1].key = $key ; key
+		$Ret[$i - 1].value = $value ; value
 		$Ret[$i - 1].check = True
-
 	Next
 
 	If UBound($Ret) = 0 Then Return False

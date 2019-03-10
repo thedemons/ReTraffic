@@ -13,6 +13,8 @@ $btnDelAll = GUICtrlCreateButton("Delete All", 80, 0, 80, 30)
 	GUICtrlSetFont(-1, 11)
 $btnGo = GUICtrlCreateButton("Go", 270, 0, 80, 30)
 	GUICtrlSetFont(-1, 11, 800)
+$btnFilter = GUICtrlCreateButton("Run Filter", 180, 0, 90, 30)
+	GUICtrlSetFont(-1, 11, 800)
 
 $List = ListURL($GUI, "Host|URL", 0, 30, 350, 763)
 $Item = Item()
@@ -92,6 +94,10 @@ While 1
 		Case $btnAddNew
 			AddNewItem()
 
+		Case $btnFilter
+
+			If MsgBox(1, "Cảnh báo", "(BETA)" & @CRLF & "Chức năng này sẽ liên tục gửi request, bạn có đồng ý?") = 1 Then $Item.filter
+
 		Case $btnCopy
 			$Item.copy
 
@@ -108,7 +114,7 @@ While 1
 		Case - 3
 			Switch $aMsg[1]
 				Case $GUI
-					If MsgBox(1, "Message", "You gonna exit?") = 1 Then Exit
+					If MsgBox(1, "Thông báo", "Bạn có muốn thoát?") = 1 Then Exit
 			EndSwitch
 
 	EndSwitch
