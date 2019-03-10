@@ -373,6 +373,8 @@ Func __GetKey($list)
 
 	For $i = 0 To $listCount - 1
 
+		If _GUICtrlListView_GetItemChecked($list, $i) = False Then ContinueLoop
+
 		$key = _GUICtrlListView_GetItemText($list, $i)
 		$value = _GUICtrlListView_GetItemText($list, $i, 1)
 		$Data &= "Local $" & __normalize($key) & ' = "' & __URIEncode($value) & '"' & @CRLF
