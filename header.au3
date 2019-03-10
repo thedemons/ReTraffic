@@ -1,4 +1,4 @@
-
+;ver=0.3
 #include-once
 
 #include <IE.au3>
